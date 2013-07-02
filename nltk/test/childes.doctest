@@ -36,7 +36,7 @@ Printing properties of the corpus files.
     Date :  1986-03-04
     Id :  01a
     Lang :  eng
-    Version :  2.0.1
+    Version :  2.0.2
     {http://www.w3.org/2001/XMLSchema-instance}schemaLocation :  http://www.talkbank.org/ns/talkbank http://talkbank.org/software/talkbank.xsd
 
 Printing information of participants of the corpus. The most common codes for
@@ -84,9 +84,9 @@ POS tags in the CHILDES are automatically assigned by MOR and POST programs
     >>> valian.tagged_words('Valian/01a.xml')[:30]
     [('at', 'prep'), ('Parent', 'n:prop'), ("Lastname's", 'n:prop'), ('house', 'n'),
     ('with', 'prep'), ('Child', 'n:prop'), ('Lastname', 'n:prop'), ('and', 'coord'),
-    ('it', 'pro'), ('is', 'v:cop'), ('March', 'n:prop'), ('fourth', 'adj'),
+    ('it', 'pro'), ('is', 'cop'), ('March', 'n:prop'), ('fourth', 'adj'),
     ('I', 'pro:sub'), ('believe', 'v'), ('and', 'coord'), ('when', 'adv:wh'),
-    ('was', 'v:cop'), ("Parent's", 'n:prop'), ('birthday', 'n'), ("Child's", 'n:prop'),
+    ('was', 'cop'), ("Parent's", 'n:prop'), ('birthday', 'n'), ("Child's", 'n:prop'),
     ('oh', 'co'), ("I'm", 'pro:sub'), ('sorry', 'adj'), ("that's", 'pro:dem'),
     ('okay', 'adj'), ('February', 'n:prop'), ('first', 'adj'),
     ('nineteen', 'det:num'), ('eighty', 'det:num'), ('four', 'det:num')]
@@ -94,9 +94,9 @@ POS tags in the CHILDES are automatically assigned by MOR and POST programs
     >>> valian.tagged_sents('Valian/01a.xml')[:10]
     [[('at', 'prep'), ('Parent', 'n:prop'), ("Lastname's", 'n:prop'), ('house', 'n'),
     ('with', 'prep'), ('Child', 'n:prop'), ('Lastname', 'n:prop'), ('and', 'coord'),
-    ('it', 'pro'), ('is', 'v:cop'), ('March', 'n:prop'), ('fourth', 'adj'),
+    ('it', 'pro'), ('is', 'cop'), ('March', 'n:prop'), ('fourth', 'adj'),
     ('I', 'pro:sub'), ('believe', 'v'), ('and', 'coord'), ('when', 'adv:wh'),
-    ('was', 'v:cop'), ("Parent's", 'n:prop'), ('birthday', 'n')],
+    ('was', 'cop'), ("Parent's", 'n:prop'), ('birthday', 'n')],
     [("Child's", 'n:prop')], [('oh', 'co'), ("I'm", 'pro:sub'), ('sorry', 'adj')],
     [("that's", 'pro:dem'), ('okay', 'adj')],
     [('February', 'n:prop'), ('first', 'adj'), ('nineteen', 'det:num'),
@@ -127,8 +127,58 @@ When the argument *relation* is true, the relational relationships in the
 sentence are returned. See Sagae et al. (2010) for details of the relational
 structure adopted in the CHILDES.
 
-    >>> valian.words('Valian/01a.xml',relation=True)[:10]
-    [[('at', 'prep', '1|0|ROOT'), ('Parent', 'n', '2|5|VOC'), ('Lastname', 'n', '3|5|MOD'), ('s', 'poss', '4|5|MOD'), ('house', 'n', '5|1|POBJ'), ('with', 'prep', '6|1|JCT'), ('Child', 'n', '7|8|NAME'), ('Lastname', 'n', '8|6|POBJ'), ('and', 'coord', '9|8|COORD'), ('it', 'pro', '10|11|SUBJ'), ('be-3S', 'v', '11|9|COMP'), ('March', 'n', '12|11|PRED'), ('fourth', 'adj', '13|12|MOD'), ('I', 'pro', '15|16|SUBJ'), ('believe', 'v', '16|14|ROOT'), ('and', 'coord', '18|17|ROOT'), ('when', 'adv', '19|20|PRED'), ('be-PAST', 'v', '20|18|COMP'), ('Parent', 'n', '21|23|MOD'), ('s', 'poss', '22|23|MOD'), ('birth', 'n', '23|20|SUBJ')], [('Child', 'n', '1|2|MOD'), ('s', 'poss', '2|0|ROOT')], [('oh', 'co', '1|4|COM'), ('I', 'pro', '3|4|SUBJ'), ('be', 'v', '4|0|ROOT'), ('sorry', 'adj', '5|4|PRED')], [('that', 'pro', '1|2|SUBJ'), ('be', 'v', '2|0|ROOT'), ('okay', 'adj', '3|2|PRED')], [('February', 'n', '1|6|VOC'), ('first', 'adj', '2|6|ENUM'), ('nineteen', 'det', '4|6|ENUM'), ('eighty', 'det', '5|6|ENUM'), ('four', 'det', '6|0|ROOT')], [('great', 'adj', '1|0|ROOT')], [('and', 'coord', '1|0|ROOT'), ('she', 'pro', '2|1|ROOT'), ('be', 'aux', '3|5|AUX'), ('two', 'det', '4|5|QUANT'), ('year-PL', 'n', '5|2|ROOT'), ('old', 'adj', '6|5|MOD')], [('correct', 'adj', '1|0|ROOT')], [('okay', 'co', '1|0|ROOT')], [('she', 'pro', '1|0|ROOT'), ('just', 'adv', '2|3|JCT'), ('turn-PERF', 'part', '3|1|XCOMP'), ('two', 'det', '4|6|QUANT'), ('a', 'det', '5|6|DET'), ('month', 'n', '6|3|OBJ'), ('ago', 'adv', '7|3|JCT')]]
+   >>> valian.words('Valian/01a.xml',relation=True)[:10]
+   [[('at', 'prep', '1|0|ROOT'),
+     ('Parent', 'n:prop', '2|5|VOC'),
+     ('Lastname', 'n:prop', '3|5|MOD'),
+     ('s', 'poss', '4|5|MOD'),
+     ('house', 'n', '5|1|POBJ'),
+     ('with', 'prep', '6|1|JCT'),
+     ('Child', 'n:prop', '7|8|NAME'),
+     ('Lastname', 'n:prop', '8|6|POBJ'),
+     ('and', 'coord', '9|8|COORD'),
+     ('it', 'pro', '10|11|SUBJ'),
+     ('be-3S', 'cop', '11|9|COMP'),
+     ('March', 'n:prop', '12|11|PRED'),
+     ('fourth', 'adj', '13|12|MOD'),
+     ('I', 'pro:sub', '15|16|SUBJ'),
+     ('believe', 'v', '16|14|ROOT'),
+     ('and', 'coord', '18|17|ROOT'),
+     ('when', 'adv:wh', '19|20|PRED'),
+     ('be-PAST', 'cop', '20|18|COMP'),
+     ('Parent', 'n:prop', '21|23|MOD'),
+     ('s', 'poss', '22|23|MOD'),
+     ('birth', 'n', '23|20|SUBJ')],
+    [('Child', 'n:prop', '1|2|MOD'), ('s', 'poss', '2|0|ROOT')],
+    [('oh', 'co', '1|4|COM'),
+     ('I', 'pro:sub', '3|4|SUBJ'),
+     ('be', 'cop', '4|0|ROOT'),
+     ('sorry', 'adj', '5|4|PRED')],
+    [('that', 'pro:dem', '1|2|SUBJ'),
+     ('be', 'cop', '2|0|ROOT'),
+     ('okay', 'adj', '3|2|PRED')],
+    [('February', 'n:prop', '1|6|VOC'),
+     ('first', 'adj', '2|6|ENUM'),
+     ('nineteen', 'det:num', '4|6|ENUM'),
+     ('eighty', 'det:num', '5|6|ENUM'),
+     ('four', 'det:num', '6|0|ROOT')],
+    [('great', 'adj', '1|0|ROOT')],
+    [('and', 'coord', '1|0|ROOT'),
+     ('she', 'pro:sub', '2|1|ROOT'),
+     ('be', 'aux', '3|5|AUX'),
+     ('two', 'det:num', '4|5|QUANT'),
+     ('year-PL', 'n', '5|2|ROOT'),
+     ('old', 'adj', '6|5|MOD')],
+    [('correct', 'adj', '1|0|ROOT')],
+    [('okay', 'co', '1|0|ROOT')],
+    [('she', 'pro:sub', '1|0|ROOT'),
+     ('just', 'adv:int', '2|3|JCT'),
+     ('turn-PERF', 'part', '3|1|XCOMP'),
+     ('two', 'det:num', '4|6|QUANT'),
+     ('a', 'det', '5|6|DET'),
+     ('month', 'n', '6|3|OBJ'),
+     ('ago', 'adv', '7|3|JCT')]]
+
 
 Printing age. When the argument *month* is true, the age information in
 the CHILDES format is converted into the number of months.
