@@ -287,6 +287,13 @@ class CHILDESCorpusReader(XMLCorpusReader):
         except (IndexError, AttributeError):
             return tag
 
+    def _get_replacement(self, xmlword):
+        if xmlword.find('./{%s}replacement' % (NS)):
+            return xmlword.find('.//{%s}replacement/{%s}w' % (NS,NS))
+        elif xmlword.find('.//{%s}wk' % (NS)):
+            return xmlword.find('.//{%s}wk' % (NS))
+        return xmlword
+
     def _get_words(self, fileid, speaker, sent, stem, relation, pos,
             strip_space, replace):
         if isinstance(speaker, string_types) and speaker != 'ALL':  # ensure we have a list of speakers
@@ -299,19 +306,26 @@ class CHILDESCorpusReader(XMLCorpusReader):
             # select speakers
             if speaker == 'ALL' or xmlsent.get('who') in speaker:
                 for xmlword in xmlsent.findall('.//{%s}w' % NS):
-                    # strip tailing space
+                    if relation:
+                        stem = pos = True
+                    if replace:
+                        xmlword = self._get_replacement(xmlword)
+                    xmlsuffix = xmlword.find('.//{%s}mor/{%s}mor-post/{%s}mw'
+                                             % (NS,NS,NS))
+                    word = xmlword.text or ''
+                    suffixStem = ''
+
                     if strip_space:
                         word = word.strip()
+
                     # stem
-                    if relation or stem:
+                    if stem:
                         stem = self._get_stem(xmlword)
                         if xmlsuffix:
                             suffixStem = self._get_stem(xmlsuffix)
-                        else:
-                            suffixStem = ''
                         word = stem or ''
                     # pos
-                    if relation or pos:
+                    if pos:
                         tag = self._get_pos(xmlword)
                         word = (word, tag)
                         if xmlsuffix:
@@ -337,7 +351,7 @@ class CHILDESCorpusReader(XMLCorpusReader):
                                           + "|" + xmlpost_rel.get('head')
                                           + "|" + xmlpost_rel.get('relation'))
                     sents.append(word)
-                    if suffixStem:
+                    if stem and suffixStem:
                         sents.append(suffixStem)
                 if sent or relation:
                     results.append(sents)
