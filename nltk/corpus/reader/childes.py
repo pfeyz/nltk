@@ -258,6 +258,35 @@ class CHILDESCorpusReader(XMLCorpusReader):
         # return {'mlu':mlu,'wordNum':numWords,'sentNum':numSents}
         return mlu
 
+    def _get_stem(self, xmlword):
+        try:
+            xmlstem = xmlword.find('.//{%s}stem' % NS)
+            stem = xmlstem.text
+        except AttributeError:
+            return ''
+        # if there is an inflection
+        try:
+            xmlinfl = xmlword.find('.//{%s}mor/{%s}mw/{%s}mk'
+                                   % (NS,NS,NS))
+            stem += '-' + xmlinfl.text
+        except:
+            pass
+        return stem
+
+    def _get_pos(self, xmlword):
+        xmlpos = xmlword.findall(".//{%s}c" % NS)
+        xmlpos2 = xmlword.findall(".//{%s}s" % NS)
+        try:
+            tag = xmlpos[0].text
+        except (IndexError, AttributeError):
+            return ''
+        if not xmlpos2:
+            return tag
+        try:
+            return '%s:%s' % (tag, xmlpos2[0].text)
+        except (IndexError, AttributeError):
+            return tag
+
     def _get_words(self, fileid, speaker, sent, stem, relation, pos,
             strip_space, replace):
         if isinstance(speaker, string_types) and speaker != 'ALL':  # ensure we have a list of speakers
@@ -270,57 +299,24 @@ class CHILDESCorpusReader(XMLCorpusReader):
             # select speakers
             if speaker == 'ALL' or xmlsent.get('who') in speaker:
                 for xmlword in xmlsent.findall('.//{%s}w' % NS):
-                    infl = None ; suffixStem = None
-                    # getting replaced words
-                    if replace and xmlsent.find('.//{%s}w/{%s}replacement'
-                                                % (NS,NS)):
-                        xmlword = xmlsent.find('.//{%s}w/{%s}replacement/{%s}w'
-                                               % (NS,NS,NS))
-                    elif replace and xmlsent.find('.//{%s}w/{%s}wk' % (NS,NS)):
-                        xmlword = xmlsent.find('.//{%s}w/{%s}wk' % (NS,NS))
-                    # get text
-                    if xmlword.text:
-                        word = xmlword.text
-                    else:
-                        word = ''
                     # strip tailing space
                     if strip_space:
                         word = word.strip()
                     # stem
                     if relation or stem:
-                        try:
-                            xmlstem = xmlword.find('.//{%s}stem' % NS)
-                            word = xmlstem.text
-                        except AttributeError as e:
-                            pass
-                        # if there is an inflection
-                        try:
-                            xmlinfl = xmlword.find('.//{%s}mor/{%s}mw/{%s}mk'
-                                                   % (NS,NS,NS))
-                            word += '-' + xmlinfl.text
-                        except:
-                            pass
-                        # if there is a suffix
-                        try:
-                            xmlsuffix = xmlword.find('.//{%s}mor/{%s}mor-post/{%s}mw/{%s}stem'
-                                                     % (NS,NS,NS,NS))
-                            suffixStem = xmlsuffix.text
-                        except AttributeError:
-                            suffixStem = ""
+                        stem = self._get_stem(xmlword)
+                        if xmlsuffix:
+                            suffixStem = self._get_stem(xmlsuffix)
+                        else:
+                            suffixStem = ''
+                        word = stem or ''
                     # pos
                     if relation or pos:
-                        try:
-                            xmlpos = xmlword.findall(".//{%s}c" % NS)
-                            xmlpos2 = xmlword.findall(".//{%s}s" % NS)
-                            if xmlpos2 != []:
-                                tag = xmlpos[0].text+":"+xmlpos2[0].text
-                            else:
-                                tag = xmlpos[0].text
-                            word = (word,tag)
-                        except (AttributeError,IndexError) as e:
-                            word = (word,None)
-                            if suffixStem:
-                                suffixStem = (suffixStem,None)
+                        tag = self._get_pos(xmlword)
+                        word = (word, tag)
+                        if xmlsuffix:
+                            suffixTag = self._get_pos(xmlsuffix)
+                            suffixStem = (suffixStem, suffixTag)
                     # relational
                     # the gold standard is stored in
                     # <mor></mor><mor type="trn"><gra type="grt">
