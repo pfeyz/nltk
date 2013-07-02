@@ -323,35 +323,19 @@ class CHILDESCorpusReader(XMLCorpusReader):
                     if relation == True:
                         for xmlstem_rel in xmlword.findall('.//{%s}mor/{%s}gra'
                                                            % (NS,NS)):
-                            if not xmlstem_rel.get('type') == 'grt':
-                                word = (word[0], word[1],
-                                        xmlstem_rel.get('index')
-                                        + "|" + xmlstem_rel.get('head')
-                                        + "|" + xmlstem_rel.get('relation'))
-                            else:
-                                word = (word[0], word[1], word[2],
-                                        word[0], word[1],
-                                        xmlstem_rel.get('index')
-                                        + "|" + xmlstem_rel.get('head')
-                                        + "|" + xmlstem_rel.get('relation'))
-                        try:
-                            for xmlpost_rel in xmlword.findall('.//{%s}mor/{%s}mor-post/{%s}gra'
-                                                               % (NS,NS,NS)):
-                                if not xmlpost_rel.get('type') == 'grt':
-                                    suffixStem = (suffixStem[0],
-                                                  suffixStem[1],
-                                                  xmlpost_rel.get('index')
-                                                  + "|" + xmlpost_rel.get('head')
-                                                  + "|" + xmlpost_rel.get('relation'))
-                                else:
-                                    suffixStem = (suffixStem[0], suffixStem[1],
-                                                  suffixStem[2], suffixStem[0],
-                                                  suffixStem[1],
-                                                  xmlpost_rel.get('index')
-                                                  + "|" + xmlpost_rel.get('head')
-                                                  + "|" + xmlpost_rel.get('relation'))
-                        except:
-                            pass
+                            # does this ever happen? what is grt?
+                            assert xmlstem_rel.get('type') != 'grt'
+                            word = (word[0], word[1],
+                                    xmlstem_rel.get('index')
+                                    + "|" + xmlstem_rel.get('head')
+                                    + "|" + xmlstem_rel.get('relation'))
+                        for xmlpost_rel in xmlword.findall('.//{%s}mor/{%s}mor-post/{%s}gra'
+                                                           % (NS,NS,NS)):
+                            suffixStem = (suffixStem[0],
+                                          suffixStem[1],
+                                          xmlpost_rel.get('index')
+                                          + "|" + xmlpost_rel.get('head')
+                                          + "|" + xmlpost_rel.get('relation'))
                     sents.append(word)
                     if suffixStem:
                         sents.append(suffixStem)
